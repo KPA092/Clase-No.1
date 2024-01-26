@@ -10,10 +10,14 @@ class BookController extends Controller
 {
 	public function index(Request $request)
 	{
+		//view crud
+		//$books = Book::get();
+		//if (!$request->ajax()) return view();
+		//return response()->json(['books' => $books], 200);
+
+		//view of blade
 		$books = Book::get();
-		if (!$request->ajax()) return view();
-		return response()->json(['books' => $books], 200);
-		//view
+		return view('index', compact('books'));
 	}
 
 	public function create()
