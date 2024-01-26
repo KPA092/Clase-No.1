@@ -31,6 +31,11 @@ class UserRequest extends FormRequest
 			array_push($rules['password'], 'nullable');
 		}
 
+		//Register del login
+		if ($this->path() != 'api/register') {
+			$rules['rol_name'] = ['required', 'string'];
+		}
+
 		return $rules;
 	}
 
