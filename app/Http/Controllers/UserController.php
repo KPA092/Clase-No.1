@@ -11,15 +11,15 @@ class UserController extends Controller
 	public function index(Request $request)
 	{
 		$users = User::get();
-		if (!$request->ajax()) return view();
+		if (!$request->ajax()) return view('users.index', compact('users'));
 		return response()->json(['users' => $users], 200);
-		//view
 	}
 
 	public function create()
 	{
-		//view
+		return view('users.create');
 	}
+
 
 	public function store(UserRequest $request)
 	{
@@ -29,16 +29,12 @@ class UserController extends Controller
 		return response()->json(['status' => 'User created', 'user' => $user], 201);
 	}
 
-	public function show(Request $request, User $user)
+
+	public function edit(User $user)
 	{
-		if (!$request->ajax()) return view();
-		return response()->json(['user' => $user], 200);
+		return view('users.edit', compact('user'));
 	}
 
-	public function edit($id)
-	{
-		//
-	}
 
 	public function update(UserRequest $request, User $user)
 	{
