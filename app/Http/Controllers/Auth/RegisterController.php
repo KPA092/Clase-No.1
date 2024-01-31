@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\User\UserRequest;
 use App\Providers\RouteServiceProvider;
-use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use App\Http\Requests\User\UserRegisterRequest;
 
 class RegisterController extends Controller
 {
@@ -24,7 +22,7 @@ class RegisterController extends Controller
 		$this->middleware('guest');
 	}
 
-	public function register(UserRequest $request)
+	public function register(UserRegisterRequest $request)
 	{
 		$user = new User($request->all());
 		$user->save();
