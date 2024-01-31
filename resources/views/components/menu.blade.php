@@ -51,6 +51,16 @@
                                 <a class="dropdown-item" href="{{ route('users.index') }}">Usuarios</a>
                             @endrole
 
+                            @role('admin|librarian')
+                                {{-- Book --}}
+                                <a class="dropdown-item" href="{{ route('books.index') }}">Libros</a>
+                            @endrole
+
+                            @can('categories.index')
+                                {{-- Category --}}
+                                <a class="dropdown-item" href="{{ route('categories.index') }}">Categorias</a>
+                            @endcan
+
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                 @csrf
                             </form>

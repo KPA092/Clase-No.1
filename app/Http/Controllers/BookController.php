@@ -8,7 +8,7 @@ use App\Http\Requests\User\BookRequest;
 
 class BookController extends Controller
 {
-	public function index(Request $request)
+	public function home(Request $request)
 	{
 		//view crud
 		//$books = Book::get();
@@ -18,6 +18,17 @@ class BookController extends Controller
 		//view of blade
 		$books = Book::get();
 		return view('index', compact('books'));
+	}
+	public function index(Request $request)
+	{
+		//view crud
+		//$books = Book::get();
+		//if (!$request->ajax()) return view();
+		//return response()->json(['books' => $books], 200);
+
+		//view of blade
+		$books = Book::with('author', 'category')->get();
+		return view('books.index', compact('books'));
 	}
 
 	public function create()
