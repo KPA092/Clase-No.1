@@ -10,10 +10,14 @@ class CategoryController extends Controller
 {
 	public function index(Request $request)
 	{
-		$categorys = Category::get();
-		if (!$request->ajax()) return view();
-		return response()->json(['categorys' => $categorys], 200);
+		// $categorys = Category::get();
+		// if (!$request->ajax()) return view();
+		// return response()->json(['categorys' => $categorys], 200);
 		//view
+
+		$categories = Category::get();
+		if (!$request->ajax()) return view();
+		return response()->json(['categories' => $categories], 200);
 	}
 
 	public function create()
@@ -23,10 +27,14 @@ class CategoryController extends Controller
 
 	public function store(CategoryRequest $request)
 	{
+		// $category = new Category($request->all());
+		// $category->save();
+		// if (!$request->ajax()) return back()->with('success', 'category created');
+		// return response()->json(['status' => 'category created', 'user' => $category], 201);
+
 		$category = new Category($request->all());
 		$category->save();
-		if (!$request->ajax()) return back()->with('success', 'category created');
-		return response()->json(['status' => 'category created', 'user' => $category], 201);
+		return response()->json([], 200);
 	}
 
 	public function show(Request $request, Category $category)

@@ -2,7 +2,7 @@ import './bootstrap'
 import { createApp } from 'vue'
 import vSelect from 'vue-select'
 
-// Components ---------------------------------------------------
+// Components
 import TheBookList from './components/Books/TheBookList.vue'
 
 const app = createApp({
