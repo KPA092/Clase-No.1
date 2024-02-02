@@ -7,8 +7,10 @@
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 
+				<backend-error :errors="back_errors" />
+
 				<!-- Formulario -->
-				<Form @submit="saveBook" :validation-schema="schema">
+				<Form @submit="saveBook" :validation-schema="schema" ref="form">
 					<div class="modal-body">
 						<section class="row">
 
@@ -16,8 +18,9 @@
 							<div class="col-12">
 								<label for="title">Titulo</label>
 								<Field name="title" v-slot="{ errorMessage, field }" v-model="book.title">
-									<input type="text" id="title" v-model="book.title" :class="`form-control ${errorMessage ? 'is-invalid' : ''}`" v-bind="field">
+									<input type="text" id="title" v-model="book.title" :class="`form-control ${errorMessage || back_errors['title'] ? 'is-invalid' : ''}`" v-bind="field">
 									<span class="invalid-feedback">{{ errorMessage }}</span>
+									<span class="invalid-feedback">{{ back_errors['title'] }}</span>
 								</Field>
 							</div>
 
@@ -25,8 +28,9 @@
 							<div class="col-12 mt-2">
 								<Field name="stock" v-slot="{ errorMessage, field }" v-model="book.stock">
 									<label for="stock">Cantidad</label>
-									<input type="number" id="stock" v-model="book.stock" :class="`form-control ${errorMessage ? 'is-invalid' : ''}`" v-bind="field">
+									<input type="number" id="stock" v-model="book.stock" :class="`form-control ${errorMessage || back_errors['stock'] ? 'is-invalid' : ''}`" v-bind="field">
 									<span class="invalid-feedback">{{ errorMessage }}</span>
+									<span class="invalid-feedback">{{ back_errors['stock'] }}</span>
 								</Field>
 							</div>
 
@@ -34,8 +38,9 @@
 							<div class="col-12 mt-2">
 								<Field name="description" v-slot="{ errorMessage, field }" v-model="book.description">
 									<label for="description">Descripcion</label>
-									<textarea v-model="book.description" :class="`form-control ${errorMessage ? 'is-invalid' : ''}`" id="description" rows="3" v-bind="field"></textarea>
+									<textarea v-model="book.description" :class="`form-control ${errorMessage || back_errors['description'] ? 'is-invalid' : ''}`" id="description" rows="3" v-bind="field"></textarea>
 									<span class="invalid-feedback">{{ errorMessage }}</span>
+									<span class="invalid-feedback">{{ back_errors['description'] }}</span>
 								</Field>
 							</div>
 
@@ -44,10 +49,12 @@
 								<Field name="author" v-slot="{ errorMessage, field }" v-model="author">
 									<label for="author">Autor</label>
 
-									<v-select :options="authors_data" label="name" v-model="author" :reduce="author => author.id" v-bind="field" placeholder="Seleccione autor" :clearable="false" :class="`${errorMessage ? 'is-invalid' : ''}`">
+									<v-select :options="authors_data" label="name" v-model="author" :reduce="author => author.id" v-bind="field" placeholder="Seleccione autor" :clearable="false" :class="`${errorMessage || back_errors['author'] ? 'is-invalid' : ''}`">
 									</v-select>
 
 									<span class="invalid-feedback">{{ errorMessage }}</span>
+									<span class="invalid-feedback">{{ back_errors['author'] }}</span>
+
 								</Field>
 							</div>
 
@@ -56,9 +63,10 @@
 								<Field name="category" v-slot="{ errorMessage, field, valid }" v-model="category">
 									<label for="category">Categoria</label>
 
-									<v-select id="category" :options="categories_data" v-model="category" :reduce="category => category.id" v-bind="field" label="name" placeholder="Selecciona categoria" :clearable="false" :class="`${errorMessage ? 'is-invalid' : ''}`">
+									<v-select id="category" :options="categories_data" v-model="category" :reduce="category => category.id" v-bind="field" label="name" placeholder="Selecciona categoria" :clearable="false" :class="`${errorMessage || back_errors['category'] ? 'is-invalid' : ''}`">
 									</v-select>
 									<span class="invalid-feedback" v-if="!valid">{{ errorMessage }}</span>
+									<span class="invalid-feedback">{{ back_errors['category'] }}</span>
 
 								</Field>
 							</div>
@@ -79,10 +87,20 @@
 <script>
 	import { Field, Form } from 'vee-validate'
 	import * as yup from 'yup'
+	import { successMessage, handlerErrors } from '@/helpers/Alerts.js'
 
 	export default {
-		props: ['authors_data'],
+		props: ['authors_data', 'book_data'],
 		components: { Field, Form },
+		watch: {
+			book_data(new_value) {
+				this.book = { ...new_value }
+				if (!this.book.id) return
+				this.is_create = false
+				this.author = this.book.author_id
+				this.category = this.book.category_id
+			}
+		},
 		computed: {
 			schema() {
 				return yup.object({
@@ -101,7 +119,8 @@
 				author: null,
 				category: null,
 				categories_data: [],
-				load_category: false
+				load_category: false,
+				back_errors: {}
 			}
 		},
 		created() {
@@ -116,11 +135,11 @@
 				try {
 					this.book.category_id = this.category
 					this.book.author_id = this.author
-					await axios.post('/books', this.book)
-					await Swal.fire('success', 'Felicidades')
-					this.$parent.closeModal()
+					if (this.is_create) await axios.post('/books', this.book)
+					else await axios.put(`/books/${this.book.id}`, this.book)
+					await successMessage({ reload: true })
 				} catch (error) {
-					console.error(error)
+					this.back_errors = await handlerErrors(error)
 				}
 			},
 			async getCategories() {
@@ -131,8 +150,17 @@
 					this.categories_data = categories
 					this.load_category = true
 				} catch (error) {
-					console.error(error)
+					await handlerErrors(error)
 				}
+			},
+			reset() {
+				this.is_create = true
+				this.book = {}
+				this.author = null
+				this.category = null
+				this.$parent.book = {}
+				this.back_errors = {}
+				setTimeout(() => this.$refs.form.resetForm(), 100)
 			}
 		}
 	}

@@ -6,15 +6,15 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
+
 class RoleAndPermissionSeeder extends Seeder
 {
 	public function run()
 	{
 		$permissionsLibrarian = [
 			'books.index',
-			'books.create',
+			'books.show',
 			'books.store',
-			'books.edit',
 			'books.update',
 			'books.destroy',
 			'categories.index',
@@ -34,7 +34,7 @@ class RoleAndPermissionSeeder extends Seeder
 			'users.destroy',
 		], $permissionsLibrarian);
 
-		//Roles
+		// Roles
 		$admin = Role::create(['name' => 'admin']);
 		$librarian = Role::create(['name' => 'librarian']);
 		Role::create(['name' => 'user']);
@@ -42,10 +42,10 @@ class RoleAndPermissionSeeder extends Seeder
 		foreach ($permissionsAdmin as $permission) {
 			$permission = Permission::create(['name' => $permission]);
 			$admin->givePermissionTo($permission);
-		};
+		}
 		foreach ($permissionsLibrarian as $permission) {
 			$permission = Permission::where(['name' => $permission])->first();
 			$librarian->givePermissionTo($permission);
-		};
+		}
 	}
 }
