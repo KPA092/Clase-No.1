@@ -4,25 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
-use App\Http\Requests\user\CategoryRequest;
+use App\Http\Requests\Category\CategoryRequest;
+use Yajra\DataTables\Facades\DataTables;
 
 class CategoryController extends Controller
 {
-	public function index(Request $request)
+	public function index()
 	{
 		// $categorys = Category::get();
 		// if (!$request->ajax()) return view();
 		// return response()->json(['categorys' => $categorys], 200);
 		//view
 
-		$categories = Category::get();
-		if (!$request->ajax()) return view();
-		return response()->json(['categories' => $categories], 200);
-	}
-
-	public function create()
-	{
-		//
+		return view('categories/index');
 	}
 
 	public function store(CategoryRequest $request)
@@ -37,28 +31,33 @@ class CategoryController extends Controller
 		return response()->json([], 200);
 	}
 
-	public function show(Request $request, Category $category)
+	public function getAll()
 	{
-		if (!$request->ajax()) return view();
-		return response()->json(['category' => $category], 200);
+		$categories = Category::query();
+		return DataTables::of($categories)->toJson();
 	}
 
-	public function edit($id)
+	public function show(Category $category)
 	{
-		//
+		// if (!$request->ajax()) return view();
+		// return response()->json(['category' => $category], 200);
+
+		return response()->json(['category' => $category], 200);
 	}
 
 	public function update(CategoryRequest $request, Category $category)
 	{
 		$category->update($request->all());
-		if (!$request->ajax()) return back()->with('success', 'Category updated');
 		return response()->json([], 204);
 	}
 
-	public function destroy(Request $request, Category $category)
+	public function destroy(Category $category)
 	{
+		// $category->delete();
+		// if (!$request->ajax()) return back()->with('success', 'Category deleted');
+		// return response()->json([], 204);
+
 		$category->delete();
-		if (!$request->ajax()) return back()->with('success', 'Category deleted');
 		return response()->json([], 204);
 	}
 }

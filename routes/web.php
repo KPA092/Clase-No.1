@@ -33,14 +33,13 @@ Route::group(['middleware' => ['auth']], function () {
 		Route::delete('/{book}', 'destroy')->name('books.destroy')->middleware('can:books.destroy');
 	});
 
-	// Category
-	Route::group(['prefix' => 'categories', 'controller' => CategoryController::class], function () {
+	// Categories
+	Route::group(['prefix' => 'categories', 'middleware' => ['role:admin'], 'controller' => CategoryController::class], function () {
 		Route::get('/', 'index')->name('categories.index')->middleware('can:categories.index');
-		Route::get('/get-all', 'index')->name('categories.get-all')->middleware('can:categories.get-all');
-		Route::get('/create', 'create')->name('categories.create')->middleware('can:categories.create');
+		Route::get('/get-all', 'getAll')->name('categories.get-all');
+		Route::get('/{category}', 'show')->name('categories.show');
 		Route::post('/', 'store')->name('categories.store')->middleware('can:categories.store');
-		Route::get('/{user}/edit', 'edit')->name('categories.edit')->middleware('can:categories.edit');
-		Route::put('/{user}', 'update')->name('categories.update')->middleware('can:categories.update');
-		Route::delete('/{user}', 'destroy')->name('categories.destroy')->middleware('can:categories.destroy');
+		Route::put('/{category}', 'update')->name('categories.update')->middleware('can:categories.update');
+		Route::delete('/{category}', 'destroy')->name('categories.destroy')->middleware('can:categories.destroy');
 	});
 });

@@ -15,10 +15,11 @@ class Category extends Model
 		'name',
 	];
 
+	/*
+		Category::with('books')->get();
+	*/
 	public function books()
 	{
 		return $this->hasMany(Book::class, 'category_id', 'id');
 	}
-
-	/* Category::with('books')->get(); */
 }

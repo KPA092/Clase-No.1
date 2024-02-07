@@ -13,7 +13,7 @@ use App\Http\Requests\Book\BookUpdateRequest;
 class BookController extends Controller
 {
 	use UploadFile;
-	public function home(Request $request)
+	public function home()
 	{
 		//view crud
 		//$books = Book::get();
@@ -21,10 +21,14 @@ class BookController extends Controller
 		//return response()->json(['books' => $books], 200);
 
 		//view of blade
-		$books = Book::with('author', 'category', 'file')->get();
+		$books = Book::with('author', 'category', 'file')
+			->whereHas('category')
+			->where('stock', '>', 0)
+			->get();
+
 		return view('index', compact('books'));
 	}
-	public function index(Request $request)
+	public function index()
 	{
 		//view crud
 		//$books = Book::get();
@@ -33,7 +37,7 @@ class BookController extends Controller
 
 		//view of blade
 		$authors = Author::get();
-		$books = Book::with('author', 'category', 'file')->get();
+		$books = Book::with('author', 'category', 'file')->whereHas('category')->get();
 		return view('books.index', compact('books', 'authors'));
 	}
 
@@ -56,7 +60,7 @@ class BookController extends Controller
 		}
 	}
 
-	public function show(Request $request, Book $book)
+	public function show(Book $book)
 	{
 		// if (!$request->ajax()) return view();
 		// return response()->json(['book' => $book], 200);
